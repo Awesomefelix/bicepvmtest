@@ -4,36 +4,49 @@ trigger:
       - main
 
 pool:
-  name: 'flxbuilder'
+  name: 'flxbuilder'  # Custom self-hosted agent pool
 
 variables:
   location: 'eastus'
   rgName: 'bicep-vm-rg'
   templateFile: 'main.bicep'
+  deploymentName: 'bicepInfraDeployment'
 
 stages:
   - stage: Deploy
     displayName: Deploy Infrastructure
     jobs:
       - job: DeployInfra
-        displayName: Deploy Bicep to Azure
+        displayName: Deploy Bicep Template to Azure
         steps:
           - checkout: self
 
           - task: AzureCLI@2
-            displayName: 'Login and Deploy Bicep Template'
+            displayName: 'Deploy Bicep Template'
             inputs:
-              azureSubscription: 'FLX' # name of your service connection
+              azureSubscription: 'FLX'  # Your service connection name
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                echo "Deploying Bicep template..."
-                
-                az group create --name $rgName --location $location
+                echo "=== Starting Bicep Deployment ==="
+                echo "Resource Group: $rgName"
+                echo "Location: $location"
+                echo "Template File: $templateFile"
 
+                # Create resource group if it doesn’t exist
+                az group create \
+                  --name "$rgName" \
+                  --location "$location"
+
+                # Deploy Bicep file
                 az deployment group create \
-                  --name "bicepInfraDeployment" \
-                  --resource-group $rgName \
-                  --template-file $templateFile \
-                  --parameters adminUsername='azureuser' adminPassword='P@ssw0rd1234!' \
-                                storagePrefix='bicepstore' location=$location
+                  --name "$deploymentName" \
+                  --resource-group "$rgName" \
+                  --template-file "$templateFile" \
+                  --parameters \
+                    adminUsername='azureuser' \
+                    adminPassword='P@ssw0rd1234!' \
+                    storagePrefix='bicepstore' \
+                    location="$location"
+
+                echo "=== Deployment Completed Successfully ==="
