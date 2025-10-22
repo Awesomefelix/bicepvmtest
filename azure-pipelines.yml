@@ -25,28 +25,5 @@ stages:
             displayName: 'Deploy Bicep Template'
             inputs:
               azureSubscription: 'FLX'  # Your service connection name
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
-                echo "=== Starting Bicep Deployment ==="
-                echo "Resource Group: $rgName"
-                echo "Location: $location"
-                echo "Template File: $templateFile"
-
-                # Create resource group if it doesn’t exist
-                az group create \
-                  --name "$rgName" \
-                  --location "$location"
-
-                # Deploy Bicep file
-                az deployment group create \
-                  --name "$deploymentName" \
-                  --resource-group "$rgName" \
-                  --template-file "$templateFile" \
-                  --parameters \
-                    adminUsername='azureuser' \
-                    adminPassword='P@ssw0rd1234!' \
-                    storagePrefix='bicepstore' \
-                    location="$location"
-
-                echo "=== Deployment Completed Successfully ==="
+              scriptType: 'ps'           # Use PowerShell for Windows agents
+              scriptLocation: 
