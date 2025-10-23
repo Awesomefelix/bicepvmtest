@@ -8,7 +8,7 @@ pool:
 
 variables:
   location: 'westus2'
-  rgName: 'flxcontainerRG'
+  rgName: 'finaldestinationRG'
   templateFile: 'main.bicep'
   deploymentName: 'bicepInfraDeployment'
 
