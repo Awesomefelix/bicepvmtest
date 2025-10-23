@@ -10,7 +10,6 @@ variables:
   location: 'uksouth'
   rgName: 'finaldestinationRG'
   templateFile: 'main.bicep'
-  deploymentName: 'bicepInfraDeployment_$(Date:yyyyMMddHHmmss)'
 
 stages:
   - stage: Deploy
@@ -33,8 +32,13 @@ stages:
                 Write-Host "Location: $env:location"
                 Write-Host "Template File: $env:templateFile"
 
+                # Generate a unique deployment name
+                $deploymentName = "bicepInfraDeployment_$(Get-Date -Format yyyyMMddHHmmss)"
+                Write-Host "Deployment Name: $deploymentName"
+
                 try {
                   az deployment sub create `
+                    --name $deploymentName `
                     --location $env:location `
                     --template-file $env:templateFile `
                     --parameters rgName=$env:rgName `
@@ -43,7 +47,7 @@ stages:
                                  adminPassword='YourSecurePassword123!' `
                     --verbose --debug
 
-                  Write-Host "=== Deployment Completed Successfully ==="
+                  Write-Host "✅ Deployment Completed Successfully ==="
                 }
                 catch {
                   Write-Host "❌ Deployment failed. See details below:" -ForegroundColor Red
