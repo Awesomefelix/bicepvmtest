@@ -4,7 +4,7 @@ targetScope = 'subscription'
 param rgName string
 
 @description('Deployment location')
-param location string = 'westus2'
+param location string = deployment().location
 
 @description('Prefix for the storage account')
 param storagePrefix string
