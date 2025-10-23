@@ -33,13 +33,20 @@ stages:
                 Write-Host "Location: $env:location"
                 Write-Host "Template File: $env:templateFile"
 
-                # Deploy the Bicep template to existing resource group
-                az deployment group create `
-                  --name $env:deploymentName `
-                  --resource-group $env:rgName `
-                  --template-file $env:templateFile `
-                  --parameters adminUsername='azureuser' adminPassword='P@ssw0rd1234!' `
-                               storagePrefix='bicepstore' location=$env:location `
-                  --verbose
+                try {
+                  # Deploy the Bicep template (existing RG)
+                  az deployment group create `
+                    --name $env:deploymentName `
+                    --resource-group $env:rgName `
+                    --template-file $env:templateFile `
+                    --parameters adminUsername='azureuser' adminPassword='P@ssw0rd1234!' `
+                                 storagePrefix='bicepstore' location=$env:location `
+                    --verbose --debug
 
-                Write-Host "=== Deployment Completed Successfully ==="
+                  Write-Host "=== Deployment Completed Successfully ==="
+                }
+                catch {
+                  Write-Host "❌ Deployment failed. See details below:" -ForegroundColor Red
+                  Write-Host $_.Exception.Message
+                  exit 1
+                }
