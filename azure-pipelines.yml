@@ -7,8 +7,8 @@ pool:
   name: 'flxbuilder'  # Your self-hosted agent pool
 
 variables:
-  location: 'eastus'
-  rgName: 'bicep-vm-rg'
+  location: 'westus2'
+  rgName: 'flxcontainerRG'
   templateFile: 'main.bicep'
   deploymentName: 'bicepInfraDeployment'
 
@@ -24,8 +24,8 @@ stages:
           - task: AzureCLI@2
             displayName: 'Deploy Bicep Template'
             inputs:
-              azureSubscription: 'FLX'  # Your service connection name
-              scriptType: 'ps'           # Use PowerShell for Windows agent
+              azureSubscription: 'FLX'
+              scriptType: 'ps'
               scriptLocation: 'inlineScript'
               inlineScript: |
                 Write-Host "=== Starting Bicep Deployment ==="
@@ -34,13 +34,13 @@ stages:
                 Write-Host "Template File: $env:templateFile"
 
                 try {
-                  # Deploy the Bicep template (existing RG)
-                  az deployment group create `
-                    --name $env:deploymentName `
-                    --resource-group $env:rgName `
+                  az deployment sub create `
+                    --location $env:location `
                     --template-file $env:templateFile `
-                    --parameters adminUsername='azureuser' adminPassword='P@ssw0rd1234!' `
-                                 storagePrefix='bicepstore' location=$env:location `
+                    --parameters rgName=$env:rgName `
+                                 storagePrefix='mystorefelixmvpinfl12356' `
+                                 adminUsername='azureuser' `
+                                 adminPassword='YourSecurePassword123!' `
                     --verbose --debug
 
                   Write-Host "=== Deployment Completed Successfully ==="
