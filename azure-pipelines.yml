@@ -7,7 +7,7 @@ pool:
   name: 'flxbuilder'  # Your self-hosted agent pool
 
 variables:
-  location: 'westus2'
+  location: 'uksouth'
   rgName: 'finaldestinationRG'
   templateFile: 'main.bicep'
   deploymentName: 'bicepInfraDeployment'
