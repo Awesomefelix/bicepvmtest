@@ -10,7 +10,7 @@ variables:
   location: 'uksouth'
   rgName: 'finaldestinationRG'
   templateFile: 'main.bicep'
-  deploymentName: 'bicepInfraDeployment'
+  deploymentName: 'bicepInfraDeployment_$(Date:yyyyMMddHHmmss)'
 
 stages:
   - stage: Deploy
