@@ -10,6 +10,9 @@ variables:
   location: 'uksouth'
   rgName: 'finaldestinationRG'
   templateFile: 'main.bicep'
+  storagePrefix: 'mystorefelixmvpinfl12356'
+  adminUsername: 'azureuser'
+  adminPassword: 'YourSecurePassword123!'  # consider storing in Azure Key Vault
 
 stages:
   - stage: Deploy
@@ -37,15 +40,27 @@ stages:
                 Write-Host "Deployment Name: $deploymentName"
 
                 try {
+                  # Create the resource group if it doesn’t exist
+                  Write-Host "Checking if resource group exists..."
+                  $rgCheck = az group exists --name $env:rgName | ConvertFrom-Json
+                  if (-not $rgCheck) {
+                    Write-Host "Creating resource group $env:rgName in $env:location"
+                    az group create --name $env:rgName --location $env:location | Out-Null
+                  } else {
+                    Write-Host "Resource group $env:rgName already exists. Proceeding with deployment..."
+                  }
+
+                  # Deploy the Bicep template
                   az deployment sub create `
                     --name $deploymentName `
                     --location $env:location `
                     --template-file $env:templateFile `
                     --parameters rgName=$env:rgName `
-                                 storagePrefix='mystorefelixmvpinfl12356' `
-                                 adminUsername='azureuser' `
-                                 adminPassword='YourSecurePassword123!' `
-                    --verbose --debug
+                                 location=$env:location `
+                                 storagePrefix=$env:storagePrefix `
+                                 adminUsername=$env:adminUsername `
+                                 adminPassword=$env:adminPassword `
+                    --verbose
 
                   Write-Host "✅ Deployment Completed Successfully ==="
                 }
