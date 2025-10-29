@@ -8,7 +8,7 @@ pool:
 
 variables:
   location: 'uksouth'
-  rgName: 'GloryRG'
+  rgName: 'FLXRG'
   templateFile: 'main.bicep'
   storagePrefix: 'mystorefelixmvpinfl12356'
   adminUsername: 'azureuser'
