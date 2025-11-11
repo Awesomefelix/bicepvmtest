@@ -62,10 +62,10 @@ stages:
                                  adminPassword=$env:adminPassword `
                     --verbose
 
-                  Write-Host "✅ Deployment Completed Successfully ==="
+                  Write-Host " Deployment Completed Successfully ==="
                 }
                 catch {
-                  Write-Host "❌ Deployment failed. See details below:" -ForegroundColor Red
+                  Write-Host " Deployment failed. See details below:" -ForegroundColor Red
                   Write-Host $_.Exception.Message
                   exit 1
                 }
