@@ -4,7 +4,7 @@ trigger:
       - main
 
 pool:
-  name: 'flxbuilder'  # Your self-hosted agent pool
+  vmImage: ubuntu-latest  # Your self-hosted agent pool
 
 variables:
   location: 'uksouth'
