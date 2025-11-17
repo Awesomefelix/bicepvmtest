@@ -1,0 +1,71 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  name: 'FLXBUILDER'  # Your self-hosted agent pool
+
+variables:
+  location: 'uksouth'
+  rgName: 'GloryRG'
+  templateFile: 'main.bicep'
+  storagePrefix: 'mystorefelixmvpinfl12356'
+  adminUsername: 'azureuser'
+  adminPassword: 'YourSecurePassword123!'  # consider storing in Azure Key Vault
+
+stages:
+  - stage: Deploy
+    displayName: Deploy Infrastructure
+    jobs:
+      - job: DeployInfra
+        displayName: Deploy Bicep Template to Azure
+        steps:
+          - checkout: self
+
+          - task: AzureCLI@2
+            displayName: 'Deploy Bicep Template'
+            inputs:
+              azureSubscription: 'FLX'
+              scriptType: 'ps'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                Write-Host "=== Starting Bicep Deployment ==="
+                Write-Host "Resource Group: $env:rgName"
+                Write-Host "Location: $env:location"
+                Write-Host "Template File: $env:templateFile"
+
+                # Generate a unique deployment name
+                $deploymentName = "bicepInfraDeployment_$(Get-Date -Format yyyyMMddHHmmss)"
+                Write-Host "Deployment Name: $deploymentName"
+
+                try {
+                  # Create the resource group if it doesn’t exist
+                  Write-Host "Checking if resource group exists..."
+                  $rgCheck = az group exists --name $env:rgName | ConvertFrom-Json
+                  if (-not $rgCheck) {
+                    Write-Host "Creating resource group $env:rgName in $env:location"
+                    az group create --name $env:rgName --location $env:location | Out-Null
+                  } else {
+                    Write-Host "Resource group $env:rgName already exists. Proceeding with deployment..."
+                  }
+
+                  # Deploy the Bicep template
+                  az deployment sub create `
+                    --name $deploymentName `
+                    --location $env:location `
+                    --template-file $env:templateFile `
+                    --parameters rgName=$env:rgName `
+                                 location=$env:location `
+                                 storagePrefix=$env:storagePrefix `
+                                 adminUsername=$env:adminUsername `
+                                 adminPassword=$env:adminPassword `
+                    --verbose
+
+                  Write-Host " Deployment Completed Successfully ==="
+                }
+                catch {
+                  Write-Host " Deployment failed. See details below:" -ForegroundColor Red
+                  Write-Host $_.Exception.Message
+                  exit 1
+                }
